@@ -186,8 +186,8 @@ if __name__ == "__main__":
     
     # Point Lighting Constants
     renderer.set_uniform("pointLight.constant", 1.0, float)
-    renderer.set_uniform("pointLight.linear", 0.12, float)
-    renderer.set_uniform("pointLight.quadratic", 0.05, float)
+    renderer.set_uniform("pointLight.linear", 0.35, float)
+    renderer.set_uniform("pointLight.quadratic", 0.44, float)
     renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
 
     # Spot Light Constants
@@ -196,8 +196,8 @@ if __name__ == "__main__":
     renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
     renderer.set_uniform("spotLight.direction", glm.vec3(0, -1, 0), glm.vec3)
     renderer.set_uniform("spotLight.constant", 1.0, float)
-    renderer.set_uniform("spotLight.linear", 0.12, float)
-    renderer.set_uniform("spotLight.quadratic", 0.05, float)
+    renderer.set_uniform("spotLight.linear", 0.35, float)
+    renderer.set_uniform("spotLight.quadratic", 0.44, float)
     renderer.set_uniform("spotLight.cutOff", cos, float)
     renderer.set_uniform("spotLight.outercutOff", outer, float)
 
