@@ -186,8 +186,8 @@ if __name__ == "__main__":
     
     # Point Lighting Constants
     renderer.set_uniform("pointLight.constant", 1.0, float)
-    renderer.set_uniform("pointLight.linear", 0.12, float)
-    renderer.set_uniform("pointLight.quadratic", 0.05, float)
+    renderer.set_uniform("pointLight.linear", 0.35, float)
+    renderer.set_uniform("pointLight.quadratic", 0.44, float)
     renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
 
     # Spot Light Constants
@@ -285,7 +285,7 @@ if __name__ == "__main__":
         ufo_orbit_angle += .1
         ufo_x = .05 * math.cos(ufo_orbit_angle)
         ufo_z = .05 * math.sin(ufo_orbit_angle)
-        ufo.set_position(glm.vec3(earth.position[0] + ufo_x_offset, .25, earth.position[2] + ufo_z_offset))
+        ufo.set_position(glm.vec3(earth.position[0] + ufo_x, .25, earth.position[2] + ufo_z))
         renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
 
         fx, fz = attraction(mars, sun)
