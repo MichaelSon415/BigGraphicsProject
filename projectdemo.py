@@ -75,8 +75,8 @@ def get_program(vertex_source_filename, fragment_source_filename):
 
 if __name__ == "__main__":
     pygame.init()
-    screen_width = 800
-    screen_height = 800
+    screen_width = 1000
+    screen_height = 1000
 
     screen = pygame.display.set_mode(
         (screen_width, screen_height),
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     earth = assimp_load_object("models/earth/Earth_1_12756.obj", "models/earth/texture.png")
     earth.set_material(glm.vec4(1, 1, 0.1, 1))
     earth.move(glm.vec3(1, 0, -5))
-    print(earth.position)
+    #print(earth.position)
     earth.grow(glm.vec3(1/6000, 1/6000, 1/6000))
     earth.radius = 16
     earth.mass = 5.9742 * 10**24
@@ -287,7 +287,7 @@ if __name__ == "__main__":
         ufo_orbit_angle += .1
         ufo_x = .05 * math.cos(ufo_orbit_angle)
         ufo_z = .05 * math.sin(ufo_orbit_angle)
-        ufo.set_position(glm.vec3(earth.position[0] + ufo_x_offset, .25, earth.position[2] + ufo_z_offset))
+        ufo.set_position(glm.vec3(earth.position[0] + ufo_x, .25, earth.position[2] + ufo_z))
         renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
 
         fx, fz = attraction(mars, sun)
