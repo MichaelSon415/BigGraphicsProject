@@ -201,6 +201,8 @@ if __name__ == "__main__":
     renderer.set_uniform("spotLight.cutOff", cos, float)
     renderer.set_uniform("spotLight.outercutOff", outer, float)
 
+    #pp
+
     # Loop
     done = False
     frames = 0
