@@ -153,9 +153,11 @@ if __name__ == "__main__":
     ufo.set_material(glm.vec4(1, 1, 0.1, 1))
     ufo.move(glm.vec3(0, .25, -5))
     ufo.grow(glm.vec3(1/800, 1/800, 1/800))
+    ufo_x_offset = 0
+    ufo_z_offset = 0
 
-    light = Object3D(None)
-    light.position = glm.vec3(0, 0, -5)
+    #light = Object3D(None)
+    #light.position = glm.vec3(0, 0, 1)
 
     
 
@@ -177,9 +179,27 @@ if __name__ == "__main__":
     ambient_color = glm.vec3(1, 1, 1)
     ambient_intensity = 0.1
     renderer.set_uniform("ambientColor", ambient_color * ambient_intensity, glm.vec3)
-    renderer.set_uniform("pointPosition", light.position, glm.vec3)
+    renderer.set_uniform("pointPosition", sun.position, glm.vec3)
     renderer.set_uniform("pointColor", glm.vec3(1, 1, 1), glm.vec3)
     renderer.set_uniform("viewPos", glm.vec3(0, 0, 0), glm.vec3)
+    renderer.set_uniform("ufoPosition", ufo.position, glm.vec3)
+    
+    # Point Lighting Constants
+    renderer.set_uniform("pointLight.constant", 1.0, float)
+    renderer.set_uniform("pointLight.linear", 0.12, float)
+    renderer.set_uniform("pointLight.quadratic", 0.05, float)
+    renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
+
+    # Spot Light Constants
+    cos = math.cos(math.radians(12.5))
+    outer = math.cos(math.radians(15))
+    renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+    renderer.set_uniform("spotLight.direction", glm.vec3(0, -1, 0), glm.vec3)
+    renderer.set_uniform("spotLight.constant", 1.0, float)
+    renderer.set_uniform("spotLight.linear", 0.12, float)
+    renderer.set_uniform("spotLight.quadratic", 0.05, float)
+    renderer.set_uniform("spotLight.cutOff", cos, float)
+    renderer.set_uniform("spotLight.outercutOff", outer, float)
 
     # Loop
     done = False
@@ -203,25 +223,37 @@ if __name__ == "__main__":
                 keys_down.remove(event.dict["key"])
 
         if pygame.K_UP in keys_down:
-            earth.rotate(glm.vec3(-0.001, 0, 0))
+            #earth.rotate(glm.vec3(-0.001, 0, 0))
+            #ufo.move(glm.vec3(0, 0.03, 0))
+            ufo_z_offset -= .01
+            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
         elif pygame.K_DOWN in keys_down:
-            earth.rotate(glm.vec3(0.001, 0, 0))
+            #earth.rotate(glm.vec3(0.001, 0, 0))
+            #ufo.move(glm.vec3(0, -0.03, 0))
+            ufo_z_offset += .01
+            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
         if pygame.K_RIGHT in keys_down:
-            earth.rotate(glm.vec3(0, 0.001, 0))
+            #earth.rotate(glm.vec3(0, 0.001, 0))
+            #ufo.move(glm.vec3(0.03, 0, 0))
+            ufo_x_offset += .03
+            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
         elif pygame.K_LEFT in keys_down:
-            earth.rotate(glm.vec3(0, -0.001, 0))
+            #earth.rotate(glm.vec3(0, -0.001, 0))
+            #ufo.move(glm.vec3(-0.03, 0, 0))
+            ufo_x_offset -= .03
+            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
         if pygame.K_a in keys_down:
-            light.move(glm.vec3(-0.003, 0, 0))
-            renderer.set_uniform("pointPosition", light.position, glm.vec3)
+            sun.move(glm.vec3(-0.01, 0, 0))
+            renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
         elif pygame.K_d in keys_down:
-            light.move(glm.vec3(0.003, 0, 0))
-            renderer.set_uniform("pointPosition", light.position, glm.vec3)
+            sun.move(glm.vec3(0.01, 0, 0))
+            renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
         elif pygame.K_w in keys_down:
-            light.move(glm.vec3(0, 0, -0.003))
-            renderer.set_uniform("pointPosition", light.position, glm.vec3)
+            sun.move(glm.vec3(0, 0, -0.01))
+            renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
         elif pygame.K_s in keys_down:
-            light.move(glm.vec3(0, 0, 0.003))
-            renderer.set_uniform("pointPosition", light.position, glm.vec3)
+            sun.move(glm.vec3(0, 0, 0.01))
+            renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -253,7 +285,8 @@ if __name__ == "__main__":
         ufo_orbit_angle += .1
         ufo_x = .05 * math.cos(ufo_orbit_angle)
         ufo_z = .05 * math.sin(ufo_orbit_angle)
-        ufo.set_position(glm.vec3(earth.position[0] + ufo_x, .25, earth.position[2] + ufo_z))
+        ufo.set_position(glm.vec3(earth.position[0] + ufo_x_offset, .25, earth.position[2] + ufo_z_offset))
+        renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
 
         fx, fz = attraction(mars, sun)
         mars.velocity[0] += fx / mars.mass * 86400
@@ -265,6 +298,8 @@ if __name__ == "__main__":
 
         renderer.use_program(shader_lighting)
         renderer.render(perspective, camera, [sun, mercury, venus, earth, mars, ufo])
+        renderer.use_program(shader_nolighting)
+        renderer.render(perspective, camera, [sun])
         pygame.display.flip()
         end = time.perf_counter()
         frames += 1
