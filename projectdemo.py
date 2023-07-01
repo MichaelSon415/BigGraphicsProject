@@ -77,11 +77,6 @@ if __name__ == "__main__":
     pygame.init()
     screen_width = 800
     screen_height = 800
-    # For Mac people.
-    # pygame.display.gl_set_attribute(GL_CONTEXT_MAJOR_VERSION, 3)
-    # pygame.display.gl_set_attribute(GL_CONTEXT_MINOR_VERSION, 3)
-    # pygame.display.gl_set_attribute(GL_CONTEXT_FORWARD_COMPATIBLE_FLAG, True)
-    # pygame.display.gl_set_attribute(GL_CONTEXT_PROFILE_COMPATIBILITY, GL_CONTEXT_PROFILE_CORE)
 
     screen = pygame.display.set_mode(
         (screen_width, screen_height),
@@ -92,55 +87,75 @@ if __name__ == "__main__":
 
     pygame.display.set_caption("Solar System Sim")
 
-    # earth = load_textured_obj("models/bunny_textured.obj")
+    AU = 149.6e6 * 1000
+    G = 6.67428e-11
+    SCALE = 1 / AU
+
+    def attraction(planet, other):
+        other_x, other_z = (other.position[0] / SCALE), (other.position[2] / SCALE)
+        distance_x = other_x - (planet.position[0] / SCALE)
+        distance_z = other_z - (planet.position[2] / SCALE)
+        distance = math.sqrt(distance_x ** 2 + distance_z ** 2)
+        planet.distance_to_sun = distance
+        force = G * planet.mass * other.mass / distance**2
+        theta = math.atan2(distance_z, distance_x)
+        force_x = math.cos(theta) * force
+        force_z = math.sin(theta) * force
+        return force_x, force_z
 
     # Sun
     sun = assimp_load_object("models/sun/Sun_1_1391000.obj", "models/sun/texture.png")
-    sun.set_material(glm.vec4(1, 1, 0.1, 1))
+    sun.set_material(glm.vec4(10, 1, 0.1, 1))
     sun.move(glm.vec3(0, 0, -5))
-    sun.grow(glm.vec3(1/800, 1/800, 1/800))
+    sun.grow(glm.vec3(1/3000, 1/3000, 1/3000))
+    sun.radius = 30
+    sun.mass = 1.98892 * 10**30
 
     # Mercury
-    # mercury = assimp_load_object("models/mercury/Mercury_1_4878.obj", "models/mercury/texture.png")
-    # mercury.set_material(glm.vec4(1, 1, 0.1, 1))
-    # mercury.move(glm.vec3(-1, 1.25, -5))
-    # mercury.grow(glm.vec3(1/800, 1/800, 1/800))
+    mercury = assimp_load_object("models/mercury/Mercury_1_4878.obj", "models/mercury/texture.png")
+    mercury.set_material(glm.vec4(1, 1, 0.1, 1))
+    mercury.move(glm.vec3(.387, 0, -5))
+    mercury.grow(glm.vec3(1/6000, 1/6000, 1/6000))
+    mercury.radius = 8
+    mercury.mass = 3.30 * 10**23
+    mercury.velocity[2] = -47.4 * 1000
 
     # Venus
-    # venus = assimp_load_object("models/venus/Venus_1_12103.obj", "models/venus/texture.png")
-    # venus.set_material(glm.vec4(1, 1, 0.1, 1))
-    # venus.move(glm.vec3(0, 0, -5))
-    # venus.grow(glm.vec3(1/800, 1/800, 1/800))
+    venus = assimp_load_object("models/venus/Venus_1_12103.obj", "models/venus/texture.png")
+    venus.set_material(glm.vec4(1, 1, 0.1, 1))
+    venus.move(glm.vec3(.723, 0, -5))
+    venus.grow(glm.vec3(1/6000, 1/6000, 1/6000))
+    venus.radius = 14
+    venus.mass = 4.8686 * 10**24
+    venus.velocity[2] = -35.02 * 1000
 
     # Earth
     earth = assimp_load_object("models/earth/Earth_1_12756.obj", "models/earth/texture.png")
     earth.set_material(glm.vec4(1, 1, 0.1, 1))
-    earth.move(glm.vec3(2, 0, -10))
-    earth.grow(glm.vec3(1/1600, 1/1600, 1/1600))
+    earth.move(glm.vec3(1, 0, -5))
+    print(earth.position)
+    earth.grow(glm.vec3(1/6000, 1/6000, 1/6000))
+    earth.radius = 16
+    earth.mass = 5.9742 * 10**24
+    earth.velocity[2] = -29.783 * 1000
 
-    # # Mars
-    # mars = assimp_load_object("models/mars/Mars_1_6792.obj", "models/mars/texture.png")
-    # mars.set_material(glm.vec4(1, 1, 0.1, 1))
-    # mars.move(glm.vec3(1.5, 0, -5))
-    # mars.grow(glm.vec3(1/800, 1/800, 1/800))
+    # Mars
+    mars = assimp_load_object("models/mars/Mars_1_6792.obj", "models/mars/texture.png")
+    mars.set_material(glm.vec4(1, 1, 0.1, 1))
+    mars.move(glm.vec3(1.524, 0, -5))
+    mars.grow(glm.vec3(1/6000, 1/6000, 1/6000))
+    mars.radius = 12
+    mars.mass = 6.39 * 10**23
+    mars.velocity[2] = -24.077 * 1000
 
     # UFO
-    ufo = assimp_load_object("models/ufo/ufo.obj", "models/ufo/texture.png") #needs its own textures
+    ufo = assimp_load_object("models/ufo/ufo.obj", "models/ufo/ufo.png") 
     ufo.set_material(glm.vec4(1, 1, 0.1, 1))
-    ufo.move(glm.vec3(0, -1.5, -5))
-    ufo.grow(glm.vec3(1/1600, 1/1600, 1/1600))
-    '''
-    boat = assimp_load_object("models/boat/boat.fbx")
-    #boat = assimp_load_object("models/backpack/backpack.obj", None, 
-    #                          assimp_py.Process_Triangulate | assimp_py.Process_FlipUVs)
-    boat.move(glm.vec3(-1, 0, -5))
-    boat.grow(glm.vec3(0.5, 0.5, 0.5))
-    boat.rotate(glm.vec3(math.pi/4, math.pi/2, math.pi/2))
-    boat.set_material(glm.vec4(1, 1, 0.3, 1))
-    '''
+    ufo.move(glm.vec3(0, .25, -5))
+    ufo.grow(glm.vec3(1/800, 1/800, 1/800))
 
     light = Object3D(None)
-    light.position = glm.vec3(0, 0, 1)
+    light.position = glm.vec3(0, 0, -5)
 
     
 
@@ -154,7 +169,7 @@ if __name__ == "__main__":
     renderer = RenderProgram()
 
     # Define the scene.
-    camera = glm.lookAt(glm.vec3(0, 0, 3), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
+    camera = glm.lookAt(glm.vec3(0, 1, 1), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
     perspective = glm.perspective(
         math.radians(30), screen_width / screen_height, 0.1, 100
     )
@@ -170,12 +185,14 @@ if __name__ == "__main__":
     done = False
     frames = 0
     start = time.perf_counter()
+    clock = pygame.time.Clock()
+    tick_rate = 60
 
     # Only draw wireframes.
     glEnable(GL_DEPTH_TEST)
     keys_down = set()
     spin = False
-    earth_orbit_angle = 0
+    mercury_orbit_angle, venus_orbit_angle, earth_orbit_angle, mars_orbit_angle, ufo_orbit_angle = 0, 0, 0, 0, 0
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -209,18 +226,49 @@ if __name__ == "__main__":
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 
-        earth_orbit_angle += .001
-        earth_x = 2 * math.cos(earth_orbit_angle)
-        earth_z = -5 - 2 * math.sin(earth_orbit_angle)
-        print(earth_x, earth_z)
-        earth.set_position(glm.vec3(earth_x, 0, earth_z))
+        fx, fz = attraction(mercury, sun)
+        mercury.velocity[0] += fx / mercury.mass * 86400
+        mercury.velocity[2] += fz / mercury.mass * 86400
+        mercury.position[0] += mercury.velocity[0] * 86400 * SCALE
+        mercury.position[2] += mercury.velocity[2] * 86400 * SCALE
+        print(mercury.position)
+        mercury.rotate(glm.vec3(0, .001, 0))
+
+        fx, fz = attraction(venus, sun)
+        venus.velocity[0] += fx / venus.mass * 86400
+        venus.velocity[2] += fz / venus.mass * 86400
+        venus.position[0] += venus.velocity[0] * 86400 * SCALE
+        venus.position[2] += venus.velocity[2] * 86400 * SCALE
+        print(venus.position)
+        venus.rotate(glm.vec3(0, .001, 0))
+
+        fx, fz = attraction(earth, sun)
+        earth.velocity[0] += fx / earth.mass * 86400
+        earth.velocity[2] += fz / earth.mass * 86400
+        earth.position[0] += earth.velocity[0] * 86400 * SCALE
+        earth.position[2] += earth.velocity[2] * 86400 * SCALE
+        print(earth.position)
         earth.rotate(glm.vec3(0, .001, 0))
 
+        ufo_orbit_angle += .1
+        ufo_x = .05 * math.cos(ufo_orbit_angle)
+        ufo_z = .05 * math.sin(ufo_orbit_angle)
+        ufo.set_position(glm.vec3(earth.position[0] + ufo_x, .25, earth.position[2] + ufo_z))
+
+        fx, fz = attraction(mars, sun)
+        mars.velocity[0] += fx / mars.mass * 86400
+        mars.velocity[2] += fz / mars.mass * 86400
+        mars.position[0] += mars.velocity[0] * 86400 * SCALE
+        mars.position[2] += mars.velocity[2] * 86400 * SCALE
+        print(mars.position)
+        mars.rotate(glm.vec3(0, .001, 0))
 
         renderer.use_program(shader_lighting)
-        renderer.render(perspective, camera, [sun, earth, ufo])
+        renderer.render(perspective, camera, [sun, mercury, venus, earth, mars, ufo])
         pygame.display.flip()
         end = time.perf_counter()
         frames += 1
+        clock.tick(tick_rate)
+        print(frames / (end - start))
 
     pygame.quit()
