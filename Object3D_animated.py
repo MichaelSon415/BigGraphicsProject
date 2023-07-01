@@ -24,6 +24,9 @@ class Object3D:
         self.acceleration = glm.vec3(0)
         self.angular_velocity = glm.vec3(0)
         self.material = material or glm.vec4(1, 1, 1, 1)
+        self.radius = 0
+        self.mass = 0
+        self.distance_to_sun = 0
         self._refresh_model_matrix()
 
    
