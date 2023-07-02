@@ -74,6 +74,7 @@ def get_program(vertex_source_filename, fragment_source_filename):
 
 
 if __name__ == "__main__":
+    
     pygame.init()
     screen_width = 1000
     screen_height = 1000
@@ -171,7 +172,13 @@ if __name__ == "__main__":
     renderer = RenderProgram()
 
     # Define the scene.
-    camera = glm.lookAt(glm.vec3(0, 1, 1), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
+    cameraPos = glm.vec3(0, 1, 1)
+    cameraFront = glm.vec3 (0, -1, -5)
+    cameraUp = glm.vec3 (0, 1, 0)
+    #camera = glm.lookAt(glm.vec3(0, 1, 1), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
+    camera = glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp)
+    cameraSpeed = 0.05
+    #camera = glm.lookAt(glm.vec3(camX, 1, camZ), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
     perspective = glm.perspective(
         math.radians(30), screen_width / screen_height, 0.1, 100
     )
@@ -224,26 +231,31 @@ if __name__ == "__main__":
             elif event.type == pygame.KEYUP:
                 keys_down.remove(event.dict["key"])
 
+        camera = glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp)
         if pygame.K_UP in keys_down:
             #earth.rotate(glm.vec3(-0.001, 0, 0))
             #ufo.move(glm.vec3(0, 0.03, 0))
-            ufo_z_offset -= .01
-            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            #ufo_z_offset -= .01
+            #renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            cameraPos += cameraSpeed * cameraFront
         elif pygame.K_DOWN in keys_down:
             #earth.rotate(glm.vec3(0.001, 0, 0))
             #ufo.move(glm.vec3(0, -0.03, 0))
-            ufo_z_offset += .01
-            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            #ufo_z_offset += .01
+            #renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            cameraPos -= cameraSpeed * cameraFront
         if pygame.K_RIGHT in keys_down:
             #earth.rotate(glm.vec3(0, 0.001, 0))
             #ufo.move(glm.vec3(0.03, 0, 0))
-            ufo_x_offset += .03
-            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            #ufo_x_offset += .03
+            #renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            cameraPos += glm.normalize(glm.cross(cameraFront, cameraUp)) * cameraSpeed
         elif pygame.K_LEFT in keys_down:
             #earth.rotate(glm.vec3(0, -0.001, 0))
             #ufo.move(glm.vec3(-0.03, 0, 0))
-            ufo_x_offset -= .03
-            renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            #ufo_x_offset -= .03
+            #renderer.set_uniform("spotLight.position", ufo.position, glm.vec3)
+            cameraPos -= glm.normalize(glm.cross(cameraFront, cameraUp)) * cameraSpeed
         if pygame.K_a in keys_down:
             sun.move(glm.vec3(-0.01, 0, 0))
             renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
