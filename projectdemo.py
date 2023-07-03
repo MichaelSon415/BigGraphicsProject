@@ -257,9 +257,13 @@ if __name__ == "__main__":
             sun.move(glm.vec3(0, 0, 0.01))
             renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
         if pygame.K_z in keys_down:
-            cameraRotation -= .01
+            cameraRotation -= .02
         elif pygame.K_x in keys_down:
+            cameraRotation -= .01
+        elif pygame.K_c in keys_down:
             cameraRotation += .01
+        elif pygame.K_v in keys_down:
+            cameraRotation += .02
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
