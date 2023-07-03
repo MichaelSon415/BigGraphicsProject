@@ -10,11 +10,15 @@ from numpy import array, empty
 from OpenGL.GL import shaders
 import os
 import assimp_py
+#import glfw
 
 from RenderProgram import *
 import time
 import math
 
+firstMouse = True
+yaw = -90.0
+pitch = 0.0
 
 def load_obj(filename) -> Object3D:
     with open(filename) as f:
@@ -74,7 +78,7 @@ def get_program(vertex_source_filename, fragment_source_filename):
 
 
 if __name__ == "__main__":
-    
+    #glfw.init()
     pygame.init()
     screen_width = 1000
     screen_height = 1000
@@ -85,7 +89,7 @@ if __name__ == "__main__":
     )
 
     print(glGetString(GL_VERSION))
-
+    
     pygame.display.set_caption("Solar System Sim")
 
     AU = 149.6e6 * 1000
@@ -175,6 +179,7 @@ if __name__ == "__main__":
     cameraPos = glm.vec3(0, 1, 1)
     cameraFront = glm.vec3 (0, -1, -5)
     cameraUp = glm.vec3 (0, 1, 0)
+    cameraRotation = 0
     #camera = glm.lookAt(glm.vec3(0, 1, 1), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
     camera = glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp)
     cameraSpeed = 0.05
@@ -231,6 +236,7 @@ if __name__ == "__main__":
             elif event.type == pygame.KEYUP:
                 keys_down.remove(event.dict["key"])
 
+        
         camera = glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp)
         if pygame.K_UP in keys_down:
             #earth.rotate(glm.vec3(-0.001, 0, 0))
@@ -268,8 +274,19 @@ if __name__ == "__main__":
         elif pygame.K_s in keys_down:
             sun.move(glm.vec3(0, 0, 0.01))
             renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
+        if pygame.K_z in keys_down:
+            cameraRotation -= .02
+        elif pygame.K_x in keys_down:
+            cameraRotation -= .01
+        elif pygame.K_c in keys_down:
+            cameraRotation += .01
+        elif pygame.K_v in keys_down:
+            cameraRotation += .02
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        cameraLocationX = 6 * math.cos((3/3.14159) * cameraRotation)
+        cameraLocationZ = 6 * math.sin((3/3.14159) * cameraRotation) - 5
+        camera = glm.lookAt(glm.vec3(cameraLocationX, 1, cameraLocationZ), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
 
 
         fx, fz = attraction(mercury, sun)
@@ -277,7 +294,7 @@ if __name__ == "__main__":
         mercury.velocity[2] += fz / mercury.mass * 86400
         mercury.position[0] += mercury.velocity[0] * 86400 * SCALE
         mercury.position[2] += mercury.velocity[2] * 86400 * SCALE
-        print(mercury.position)
+        #print(mercury.position)
         mercury.rotate(glm.vec3(0, .001, 0))
 
         fx, fz = attraction(venus, sun)
@@ -285,7 +302,7 @@ if __name__ == "__main__":
         venus.velocity[2] += fz / venus.mass * 86400
         venus.position[0] += venus.velocity[0] * 86400 * SCALE
         venus.position[2] += venus.velocity[2] * 86400 * SCALE
-        print(venus.position)
+        #print(venus.position)
         venus.rotate(glm.vec3(0, .001, 0))
 
         fx, fz = attraction(earth, sun)
@@ -293,7 +310,7 @@ if __name__ == "__main__":
         earth.velocity[2] += fz / earth.mass * 86400
         earth.position[0] += earth.velocity[0] * 86400 * SCALE
         earth.position[2] += earth.velocity[2] * 86400 * SCALE
-        print(earth.position)
+        #print(earth.position)
         earth.rotate(glm.vec3(0, .001, 0))
 
         ufo_orbit_angle += .1
@@ -307,7 +324,7 @@ if __name__ == "__main__":
         mars.velocity[2] += fz / mars.mass * 86400
         mars.position[0] += mars.velocity[0] * 86400 * SCALE
         mars.position[2] += mars.velocity[2] * 86400 * SCALE
-        print(mars.position)
+        #print(mars.position)
         mars.rotate(glm.vec3(0, .001, 0))
 
         renderer.use_program(shader_lighting)
