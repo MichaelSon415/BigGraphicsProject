@@ -133,7 +133,7 @@ if __name__ == "__main__":
     earth = assimp_load_object("models/earth/Earth_1_12756.obj", "models/earth/texture.png")
     earth.set_material(glm.vec4(1, 1, 0.1, 1))
     earth.move(glm.vec3(1, 0, -5))
-    print(earth.position)
+    #print(earth.position)
     earth.grow(glm.vec3(1/6000, 1/6000, 1/6000))
     earth.radius = 16
     earth.mass = 5.9742 * 10**24
@@ -171,7 +171,9 @@ if __name__ == "__main__":
     renderer = RenderProgram()
 
     # Define the scene.
+    cameraRotation = 0
     camera = glm.lookAt(glm.vec3(0, 1, 1), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
+    print(camera)
     perspective = glm.perspective(
         math.radians(30), screen_width / screen_height, 0.1, 100
     )
@@ -248,22 +250,29 @@ if __name__ == "__main__":
         elif pygame.K_d in keys_down:
             sun.move(glm.vec3(0.01, 0, 0))
             renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
-        elif pygame.K_w in keys_down:
+        if pygame.K_w in keys_down:
             sun.move(glm.vec3(0, 0, -0.01))
             renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
         elif pygame.K_s in keys_down:
             sun.move(glm.vec3(0, 0, 0.01))
             renderer.set_uniform("pointLight.position", sun.position, glm.vec3)
+        if pygame.K_z in keys_down:
+            cameraRotation -= .01
+        elif pygame.K_x in keys_down:
+            cameraRotation += .01
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+        cameraLocationX = 6 * math.cos((3/3.14159) * cameraRotation)
+        cameraLocationZ = 6 * math.sin((3/3.14159) * cameraRotation) - 5
+        camera = glm.lookAt(glm.vec3(cameraLocationX, 1, cameraLocationZ), glm.vec3(0, 0, -5), glm.vec3(0, 1, 0))
 
         fx, fz = attraction(mercury, sun)
         mercury.velocity[0] += fx / mercury.mass * 86400
         mercury.velocity[2] += fz / mercury.mass * 86400
         mercury.position[0] += mercury.velocity[0] * 86400 * SCALE
         mercury.position[2] += mercury.velocity[2] * 86400 * SCALE
-        print(mercury.position)
+        #print(mercury.position)
         mercury.rotate(glm.vec3(0, .001, 0))
 
         fx, fz = attraction(venus, sun)
@@ -271,7 +280,7 @@ if __name__ == "__main__":
         venus.velocity[2] += fz / venus.mass * 86400
         venus.position[0] += venus.velocity[0] * 86400 * SCALE
         venus.position[2] += venus.velocity[2] * 86400 * SCALE
-        print(venus.position)
+        #print(venus.position)
         venus.rotate(glm.vec3(0, .001, 0))
 
         fx, fz = attraction(earth, sun)
@@ -279,7 +288,7 @@ if __name__ == "__main__":
         earth.velocity[2] += fz / earth.mass * 86400
         earth.position[0] += earth.velocity[0] * 86400 * SCALE
         earth.position[2] += earth.velocity[2] * 86400 * SCALE
-        print(earth.position)
+        #print(earth.position)
         earth.rotate(glm.vec3(0, .001, 0))
 
         ufo_orbit_angle += .1
@@ -293,7 +302,7 @@ if __name__ == "__main__":
         mars.velocity[2] += fz / mars.mass * 86400
         mars.position[0] += mars.velocity[0] * 86400 * SCALE
         mars.position[2] += mars.velocity[2] * 86400 * SCALE
-        print(mars.position)
+        #print(mars.position)
         mars.rotate(glm.vec3(0, .001, 0))
 
         renderer.use_program(shader_lighting)
@@ -304,6 +313,6 @@ if __name__ == "__main__":
         end = time.perf_counter()
         frames += 1
         clock.tick(tick_rate)
-        print(frames / (end - start))
+        #print(frames / (end - start))
 
     pygame.quit()
